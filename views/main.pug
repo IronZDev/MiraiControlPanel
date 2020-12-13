@@ -1,22 +1,23 @@
 extends layout
 
 block content
-    div(class="ht-tm-element card mb-3 mt-1 text-center border-primary mx-2" )
+    div(class="ht-tm-element card mb-3 mt-2 text-center border-primary mx-2" )
         div(class="card-header")
-            h1(class="panel-title text-primary") Mirai Control Panel
-    div(class="card mx-auto" style="width: 50vw;")
-        div(class="card-body")
-            form
-                div(class="ht-tm-codeblock")
-                    select(class="ht-tm-element custom-select custom-select-lg" name="attackType")
-                        option(selected) Choose attack type
-                        option(value="1") Attack 1
-                        option(value="2") Attack 2
-                        option(value="3") Attack 3
-                br
-                div(class="ht-tm-codeblock")
-                    div(class="ht-tm-element input-group")
-                        input(type="text" class="form-control form-control-lg" placeholder="Target IP address" id="targetIP" name="targetIP")
-                        div(class="input-group-append")
-                            button(class="btn btn-lg btn-primary" type="button" id="attackBtn") Attack!
+            h1(class="panel-title text-info") Mirai Control Panel
+    div(class="d-flex flex-row justify-content-center align-items-center" style="height: 50vh;")
+            div(class="card mx-auto" style="width: 50vw;")
+                div(class="card-body")
+                    form
+                        div(class="ht-tm-codeblock")
+                            select(class="ht-tm-element custom-select custom-select-lg" name="attackType" id="attackSelect")
+                                option(selected) Choose attack type
+                                option(value="1") Attack 1
+                                option(value="2") Attack 2
+                                option(value="3") Attack 3
+                        br
+                        div(class="ht-tm-codeblock")
+                            div(class="ht-tm-element input-group")
+                                input(type="text" class="form-control form-control-lg" placeholder="Target IP address" id="targetIP" name="targetIP")
+                                div(class="input-group-append")
+                                    button(class="btn btn-lg btn-primary" type="button" id="attackBtn" disabled) Attack!
     script(src="javascripts/clientMain.js")
