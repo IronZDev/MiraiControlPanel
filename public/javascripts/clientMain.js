@@ -52,9 +52,16 @@ $('#startAttackForm').ajaxForm({
     },
     error: function (response) {
         console.log(response);
-        isAttackStarted = false;
-        checkValidity();
         alert(response.responseText);
-        window.location.replace("/err");
+        if (response.responseText.includes("before sending another attack")) {
+            const timeout = parseInt(response.responseText.replace ( /[^\d.]/g, ''), 10);
+            setTimeout(function () {
+                isAttackStarted = false;
+                // try to unlock button after the previous attack has finished
+                checkValidity();
+            }, timeout * 1000);
+        } else {
+            window.location.replace("/err");
+        }
     }
 });

